@@ -8,7 +8,20 @@ const LogInScreen = () => {
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    axios({
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      url: "http://localhost:5000/log-in",
+      data: {
+        email: data.email,
+        password: data.password,
+      },
+    })
+      .then((res) => console.log(res.data))
+      .catch((err) => console.log(err.response.data));
+
     reset({
       username: "",
       password: "",
@@ -40,14 +53,14 @@ const LogInScreen = () => {
         onSubmit={onSubmit}
       >
         <TextField
-          placeholder="Username"
+          placeholder="Email"
           type="text"
-          {...register("username")}
+          {...register("email", { required: true })}
         />
         <TextField
           placeholder="Password"
           type="password"
-          {...register("password")}
+          {...register("password", { required: true })}
         />
         <Button variant="contained" type="submit">
           Log in
