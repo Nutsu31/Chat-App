@@ -8,6 +8,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
+import MessengerScreen from "./pages/MessengerScreen";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,6 +16,9 @@ const router = createBrowserRouter(
       <Route path="/">
         <Route index element={<LogInScreen />} />
         <Route path="/sing-up" element={<RegisterScreen />} />
+      </Route>
+      <Route path="/messenger">
+        <Route index element={<MessengerScreen />} />
       </Route>
     </>
   )

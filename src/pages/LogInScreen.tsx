@@ -1,11 +1,16 @@
-import { Box, Button, TextField } from "@mui/material";
-import React from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import MainText from "../components/MainText";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { DataTypes, ErrorTypes } from "../types/Types";
+import { handleCheck } from "../utils/Functions";
 const LogInScreen = () => {
   const { register, handleSubmit, reset } = useForm();
+  const [data, setData] = useState<DataTypes>({});
+  const [error, setError] = useState<ErrorTypes>({});
+  const navigate = useNavigate();
 
   const onSubmit = handleSubmit((data) => {
     axios({
@@ -19,14 +24,22 @@ const LogInScreen = () => {
         password: data.password,
       },
     })
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err.response.data));
+      .then((res) => handleCheck(res.data, setError, setData))
+      .catch((err) => setError(err.response.data));
 
     reset({
       username: "",
       password: "",
     });
   });
+
+  useEffect(() => {
+    if (data.status === "ok") {
+      return () => navigate("/messenger");
+    } else {
+      return () => navigate("/");
+    }
+  }, [data, error]);
 
   return (
     <Box
@@ -62,6 +75,15 @@ const LogInScreen = () => {
           type="password"
           {...register("password", { required: true })}
         />
+        {error.status === "bad" ? (
+          <Typography
+            component="span"
+            color="error"
+            sx={{ textAlign: "center" }}
+          >
+            {error.user}
+          </Typography>
+        ) : null}
         <Button variant="contained" type="submit">
           Log in
         </Button>
