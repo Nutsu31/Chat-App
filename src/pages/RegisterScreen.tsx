@@ -1,5 +1,5 @@
-import { Box, Button, TextField } from "@mui/material";
-import React from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
 import MainText from "../components/MainText";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -7,23 +7,29 @@ import axios from "axios";
 
 const RegisterScreen = () => {
   const { register, handleSubmit, reset } = useForm();
+  const [error, setError] = useState("");
 
   const onSubmit = handleSubmit((data) => {
-    axios({
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      url: "http://localhost:5000/sing-up",
-      data: {
-        name: data.name,
-        lastname: data.lastname,
-        email: data.email,
-        password: data.password,
-      },
-    })
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err));
+    if (data.password !== data.re_password) {
+      return setError("Password doesn't match");
+    } else {
+      setError("");
+      axios({
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        url: "http://localhost:5000/sing-up",
+        data: {
+          name: data.name,
+          lastname: data.lastname,
+          email: data.email,
+          password: data.password,
+        },
+      })
+        .then((res) => console.log(res.data))
+        .catch((err) => setError(err.response.data.text));
+    }
 
     reset({
       name: "",
@@ -83,6 +89,15 @@ const RegisterScreen = () => {
           type="password"
           {...register("re_password", { required: true })}
         />
+        {error ? (
+          <Typography
+            component="span"
+            color="error"
+            sx={{ textAlign: "center" }}
+          >
+            {error}
+          </Typography>
+        ) : null}
         <Button variant="contained" type="submit">
           Sing Up
         </Button>
