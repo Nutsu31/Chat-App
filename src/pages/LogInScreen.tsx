@@ -1,45 +1,64 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import MainText from "../components/MainText";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { DataTypes, ErrorTypes } from "../types/Types";
-import { handleCheck } from "../utils/Functions";
+import { baseUrl } from "../utils/Functions";
+import io from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
+import { ACTIONS } from "../redux/userProfile/userType";
+import { StateTypes } from "../types/Types";
 const LogInScreen = () => {
   const { register, handleSubmit, reset } = useForm();
-  const [data, setData] = useState<DataTypes>({});
-  const [error, setError] = useState<ErrorTypes>({});
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
+  const socket = useMemo(() => io(baseUrl), []);
+
+  const userState = useSelector((state: StateTypes) => state);
+
+  const dispatch = useDispatch();
+
+  //////////////////////////////////////////////////////////////////////////////
+  useEffect(() => {
+    if (userState.isUserLoggedIn) {
+      navigate("/messenger");
+      socket.emit("connection", userState.user.user?.email);
+    }
+  }, [userState]);
+
+  //////////////////////////////////////////////////////////////////////////////
   const onSubmit = handleSubmit((data) => {
+    dispatch({ type: ACTIONS.FETCH_USER_REQUEST });
     axios({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      url: "http://localhost:5000/log-in",
+      url: `${baseUrl}/log-in`,
       data: {
         email: data.email,
         password: data.password,
       },
     })
-      .then((res) => handleCheck(res.data, setError, setData))
-      .catch((err) => setError(err.response.data));
+      .then((res) =>
+        dispatch({
+          type: ACTIONS.FETCH_USER_SUCCESS,
+          payload: { user: res.data },
+        })
+      )
+      .catch((err) =>
+        dispatch({
+          type: ACTIONS.FETCH_USER_ERROR,
+          payload: { error: err.message },
+        })
+      );
 
     reset({
       username: "",
       password: "",
     });
   });
-
-  useEffect(() => {
-    if (data.status === "ok") {
-      return () => navigate("/messenger");
-    } else {
-      return () => navigate("/");
-    }
-  }, [data, error]);
 
   return (
     <Box
@@ -75,13 +94,13 @@ const LogInScreen = () => {
           type="password"
           {...register("password", { required: true })}
         />
-        {error.status === "bad" ? (
+        {userState.user.status === "bad" ? (
           <Typography
             component="span"
             color="error"
             sx={{ textAlign: "center" }}
           >
-            {error.user}
+            {userState.user.user?.email}
           </Typography>
         ) : null}
         <Button variant="contained" type="submit">

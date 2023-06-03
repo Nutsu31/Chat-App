@@ -1,27 +1,24 @@
 
-export interface ErrorTypes {
-    status?:string,
-    user?:string
-}
-
-export interface DataTypes {
+export interface StateTypes {
+  isUserLoggedIn:boolean,
+  error:string,
+  loading:boolean,
+  user:{
     status?:string,
     user?:{
-        name?:string,
-        email?: string,
-        id?: string,
-        lastname?:string
+      name?:string,
+      email?: string,
+      id?: string,
+      lastname?:string,
+      friends?:string,
     }
+  }
+}
+
+export interface ActionType {
+  type:string,
+  payload: StateTypes
 }
 
 
-  
-  type SetErrFunction = React.Dispatch<React.SetStateAction<ErrorTypes>>;
-  type SetDataFunction = React.Dispatch<React.SetStateAction<DataTypes>>;
-  
-export type HandleCheckType = (
-    data: DataTypes,
-    setErr: SetErrFunction,
-    setData: SetDataFunction
-  ) => void;
-  
+

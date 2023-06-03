@@ -4,6 +4,7 @@ import MainText from "../components/MainText";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { baseUrl } from "../utils/Functions";
 
 const RegisterScreen = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -19,7 +20,7 @@ const RegisterScreen = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        url: "http://localhost:5000/sing-up",
+        url: `${baseUrl}/sing-up`,
         data: {
           name: data.name,
           lastname: data.lastname,

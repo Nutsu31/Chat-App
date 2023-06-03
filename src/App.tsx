@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import "./styles/app.css";
 import LogInScreen from "./pages/LogInScreen";
 import RegisterScreen from "./pages/RegisterScreen";
@@ -8,7 +7,9 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import MessengerScreen from "./pages/MessengerScreen";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import PivatRoute from "./pages/PivatRoute";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,7 +19,7 @@ const router = createBrowserRouter(
         <Route path="/sing-up" element={<RegisterScreen />} />
       </Route>
       <Route path="/messenger">
-        <Route index element={<MessengerScreen />} />
+        <Route index element={<PivatRoute />} />
       </Route>
     </>
   )
@@ -27,7 +28,9 @@ const router = createBrowserRouter(
 function App() {
   return (
     <>
-      <RouterProvider router={router} />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </>
   );
 }
